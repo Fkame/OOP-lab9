@@ -8,7 +8,7 @@ public class CrawlerTask implements Runnable {
 	// Объект со всеми списками
     private URLPool myPool;
     
-    /** Constructor to set the variable URL pool to the pool passed to method */    
+    /** Конструктор задачника. Передаваемый параметр - объект, хранящий списки */    
 	public CrawlerTask(URLPool pool) {
         this.myPool = pool;
     }
@@ -27,21 +27,10 @@ public class CrawlerTask implements Runnable {
         LinkedList<URLDepthPair> linksList = new LinkedList<URLDepthPair>();
         linksList = Crawler.parsePage(element);
         
+		Crawler.showResults(element, linksList);
+		
 		for (URLDepthPair pair: linksList) {
 			myPool.put(pair);
 		}
-		
-		//System.exit(0);
-		
-		/*
-        // Iterate through links from site.
-        for (int i=0;i<linksList.size();i++) {
-            String newURL = linksList.get(i);
-            
-            // Create a new depth pair for each link found and add to pool.
-            URLDepthPair newDepthPair = new URLDepthPair(newURL, myDepth + 1);
-            myPool.put(newDepthPair);
-        }
-		*/
     }
 }

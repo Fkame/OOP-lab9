@@ -40,9 +40,7 @@ public class Crawler {
 
 	// Конструктор
 	public Crawler() {
-		//notVisitedList = new LinkedList<URLDepthPair>();
-		//visitedList = new LinkedList<URLDepthPair>();
-		//listOfUrl = new LinkedList<URLDepthPair>();
+	
 	}
 
 
@@ -59,17 +57,40 @@ public class Crawler {
 		URLPool pool = new URLPool(crawler.depth);
         pool.put(firstRezAndSetDepth);
 		
+		System.out.println();
+		
 		int totalThreads = 0;
         int initialActive = Thread.activeCount();
 		
-		while (pool.getWaitThreads() != crawler.numOfThreads) {
+		// Остановка определяется тем, что списки не изменили свои значения
+		LinkedList<URLDepthPair> getWatchedList = pool.getWatchedList();
+		LinkedList<URLDepthPair> getNotWatchedList = pool.getNotWatchedList();
+		LinkedList<URLDepthPair> getBlockedList = pool.getBlockedList();
+		
+		int sizeW = getWatchedList.size();
+		int sizeN = getNotWatchedList.size();
+		int sizeB = getBlockedList.size();
+		int sumTime = 0;
+		
+		// Если 10 сек списки не менялись, то производим выход
+		while (sumTime < 10000) {
+			
             if (Thread.activeCount() - initialActive < crawler.numOfThreads) {
                 CrawlerTask crawlerTask = new CrawlerTask(pool);
                 new Thread(crawlerTask).start();
             }
             else {
                 try {
-                    Thread.sleep(100);  // 0.1 second
+                    Thread.sleep(100);  // 100 миллисекунд == 0.1 секунда
+					if (sizeW == getWatchedList.size() && sizeB == getBlockedList.size() && sizeN == getNotWatchedList.size()) {
+						sumTime += 100;
+					}
+					else {
+						sumTime = 0;
+						sizeW = getWatchedList.size();
+						sizeN = getNotWatchedList.size();
+						sizeB = getBlockedList.size();
+					}
                 }
                 // Catch InterruptedException.
                 catch (InterruptedException ie) {
@@ -83,37 +104,30 @@ public class Crawler {
 		System.out.println("");
 		System.out.println("-----------------------------------");
 		System.out.println("----------Progs work end-----------");
-		System.out.println("-----------Rezults:----------------");
+		System.out.println("-------------Rezults:--------------");
 		System.out.println("-----------------------------------");
 		
-		LinkedList<URLDepthPair> list = pool.getWatchedList();
 		System.out.println("Watched pages:");
 		int count = 1;
-		for (URLDepthPair page : list) {
+		for (URLDepthPair page : getWatchedList) {
 			System.out.println(count + " |  " + page.toString());
 			count += 1;
 		}
 		
-		list = pool.getBlockedList();
-		System.out.println("Pages that have not been parsed:");
+		System.out.println("\nPages that have not been parsed:");
 		count = 1;
-		for (URLDepthPair page : list) {
+		for (URLDepthPair page : getBlockedList) {
 			System.out.println(count + " |  " + page.toString());
 			count += 1;
 		}
 		
 		System.out.println("-----------------------------------");
 		System.out.println("----------End of rezults-----------");
-		System.out.println("-----------End of prog-------------");
+		System.out.println("------------End of prog------------");
 		System.out.println("-----------------------------------");
 		
 		System.exit(0);
 		
-		
-		
-		//crawler.startParse();
-		//crawler.showResults();
-		//crawler.testParse();
 	}
 	
 	/*
@@ -131,20 +145,6 @@ public class Crawler {
 		listOfUrl.addLast(newURL);
 	}
 	
-
-	/*
-	* Получение списков
-	*/
-	/*
-	public LinkedList<URLDepthPair> getVisitedSites() {
-		return this.visitedList;
-	}
-
-	public LinkedList<URLDepthPair> getNotVisitedSites() {
-		return this.notVisitedList;
-	}
-	*/
-
 
 	/*
 	* Проверка командной строки, ввода пользователя и добавление первого объекта URLDepthPair
@@ -166,8 +166,6 @@ public class Crawler {
 		// Получение и замена глубины
 		this.depth = urlDepth.getDepth();
 		urlDepth.setDepth(0);
-
-		// Занесение в список
 		
 		return(urlDepth);
 
@@ -225,13 +223,10 @@ public class Crawler {
 			}
 			//System.out.println("REQUEST IS GOOD!\n");
 
-			// Чтение основного файла
-			//System.out.println("---Start of file---");
 
 			// В цикле ниже происходит поиск и сбок всех ссылок со страницы
 			// Для этого осуществляется просмотр всех строк html-кода страницы
 			int strCount = 0;
-			//int strCount2 = 0;
 			while(line != null) {
 				// На всякий случай обработка исключений, потому что bufferedReader может вполне выкинуть его
 				try {
@@ -251,21 +246,21 @@ public class Crawler {
 						
 					// Если ссылка ведёт на сайт с протоколом https - пропускаем
 					if (url.startsWith("https://")) {
-						System.out.println(strCount + " |  " + url + " --> https-refference\n");
+						//System.out.println(strCount + " |  " + url + " --> https-refference\n");
 						continue;
 					}
 						
 					// Если ссылка - ссылка с возвратом
 					if (url.startsWith("../")) {		
 						String newUrl = CrawlerHelper.urlFromBackRef(element.getURL(), url);
-						System.out.println(strCount + " |  " + url + " --> " +  newUrl + "\n");
+						//System.out.println(strCount + " |  " + url + " --> " +  newUrl + "\n");
 						Crawler.createURlDepthPairObject(newUrl, element.getDepth() + 1, listOfUrl);
 					} 
 						
 					// Если это новая http ссылка
 					else if (url.startsWith("http://")) {
 						String newUrl = CrawlerHelper.cutTrashAfterFormat(url);
-						System.out.println(strCount + " |  " + url + " --> " + newUrl + "\n");
+						//System.out.println(strCount + " |  " + url + " --> " + newUrl + "\n");
 						Crawler.createURlDepthPairObject(newUrl, element.getDepth() + 1, listOfUrl);
 					} 
 						
@@ -276,11 +271,9 @@ public class Crawler {
 						String newUrl;
 						newUrl = CrawlerHelper.cutURLEndFormat(element.getURL()) + url;
 							
-						System.out.println(strCount + " |  " + url + " --> " + newUrl + "\n");
+						//System.out.println(strCount + " |  " + url + " --> " + newUrl + "\n");
 						Crawler.createURlDepthPairObject(newUrl, element.getDepth() + 1, listOfUrl);
 					}
-						
-					//strCount2 += 1;
 				}
 				catch (Exception e) {
 					break;
@@ -288,13 +281,11 @@ public class Crawler {
 			}
 				
 			if (strCount == 1) {
-				//System.out.println("No http refs in this page!");
+				System.out.println("No http refs in this page!");
 				return null;
 			}
-			//System.out.println("---End of file---\n");
-
-			//System.out.println("Page had been closed\n");
-				
+			
+		
 		}
 		catch (UnknownHostException e) {
 			System.out.println("Opps, UnknownHostException catched, so [" + element.getURL() + "] is not workable now!");
@@ -302,14 +293,6 @@ public class Crawler {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-			
-		// Перемещение сайта после просмотра в список просмотренных
-		//moveURLPair(nowPage, socket);
-			
-		// Ещё одна избыточность, для правльной работы цикла в случае, когда не возникло ошибок
-		//nowPage = notVisitedList.getFirst();
-		
-		Crawler.showResults(element, listOfUrl);
 		
 		return listOfUrl;
 	}
@@ -318,7 +301,7 @@ public class Crawler {
 	/*
 	* Вывод в консоль результатов
 	*/
-	public static void showResults(URLDepthPair element, LinkedList<URLDepthPair> listOfUrl) {
+	public synchronized static void showResults(URLDepthPair element, LinkedList<URLDepthPair> listOfUrl) {
 		System.out.println("---Rezults of working---");
 		System.out.println("Origin page: " + element.getURL());
 
