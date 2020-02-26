@@ -28,6 +28,8 @@ public class CrawlerHelper {
 			return null;
 		}
 		
+		System.out.println("");
+		
 		URLDepthPair urlDepth;
 		
 		// Вызов конструктора класса конструктором класса (вызовается, если не понравится какой-либо параметр)
@@ -83,6 +85,44 @@ public class CrawlerHelper {
 		}
 		return urlDepth;	
 	}
+
+	
+	/*
+	* Получение количества потоков
+	*/
+	public static int getNumOfThreads(String[] args) {
+		if (args == null || args.length < 3) {
+			// Получение ввода от пользователя
+			
+			// Сканер ввода пользователя
+			Scanner in = new Scanner(System.in);
+			
+			boolean nice = false;
+			while (!nice) {
+				try{
+					System.out.println("Enter amount of threads which you want to do parsing:");
+					int input = in.nextInt();
+					if (input > 0 && input < 100) nice = true;
+				}
+				catch (Exception e) {
+					in.nextLine();
+				}
+				System.out.println("");
+			}
+		} 
+		else {
+			// Считывание из аргументов командной строки
+			int threads;
+			try {
+				threads = Integer.parseInt(args[2]);
+				if (threads > 0) return threads;
+			} catch (Exception e) {
+				System.out.println("Error threads-parameter in arguments. Using default amount!");
+			}
+		}
+		return Crawler.NUM_OF_DEFAULT_THREADS;
+	}
+	
 	
 	/*
 	* Вывод информации по интересующему URL

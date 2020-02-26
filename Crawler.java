@@ -8,15 +8,8 @@ public class Crawler {
 
 	public static final int HTTP_PORT = 80;
 	public static final String HOOK_REF = "<a href=\"";
-	
-	
-	public static final String HOOK_HTTP = "<a href=\"http://";
-	public static final String HOOK_HTTPS = "<a href=\"https://";
-	public static final String HOOK_BACK = "<a href=\"../";
-	
-	
 	public static final String BAD_REQUEST_LINE = "HTTP/1.1 400 Bad Request";
-	
+
 	public static final int NUM_OF_DEFAULT_THREADS = 4;
 	
 
@@ -25,12 +18,6 @@ public class Crawler {
 	//public static final String testURL = "http://users.cms.caltech.edu/~donnie/cs11/java/lectures/cs11-java-lec1.pdf";
 	public static final int testDepth = 1;
 
-	// Список посещённых сайтов, и ещё непосещённых
-	//LinkedList<URLDepthPair> notVisitedList;
-	//LinkedList<URLDepthPair> visitedList;
-	
-	// Список полученных ссылок
-	//LinkedList<URLDepthPair> listOfUrl;
 	
 	// Глубина поиска
 	public int depth;
@@ -48,12 +35,12 @@ public class Crawler {
 	public static void main (String[] args) {
 
 		Crawler crawler = new Crawler();
-
-		crawler.numOfThreads = Crawler.NUM_OF_DEFAULT_THREADS;
 		
 		// Считывание данных с консоли как аргументов, или запрос данных от пользователя
 		// Функция getFirstURLDepthPair также настраивает максимальную глубину
 		URLDepthPair firstRezAndSetDepth = crawler.getFirstURLDepthPair(args);
+		crawler.numOfThreads = CrawlerHelper.getNumOfThreads(args);
+		
 		URLPool pool = new URLPool(crawler.depth);
         pool.put(firstRezAndSetDepth);
 		
@@ -127,7 +114,6 @@ public class Crawler {
 		System.out.println("-----------------------------------");
 		
 		System.exit(0);
-		
 	}
 	
 	/*
