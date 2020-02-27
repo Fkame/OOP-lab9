@@ -40,6 +40,7 @@ public class Crawler {
 		// Функция getFirstURLDepthPair также настраивает максимальную глубину
 		URLDepthPair firstRezAndSetDepth = crawler.getFirstURLDepthPair(args);
 		crawler.numOfThreads = CrawlerHelper.getNumOfThreads(args);
+		//System.out.println("Num of threads = " + crawler.numOfThreads);
 		
 		URLPool pool = new URLPool(crawler.depth);
         pool.put(firstRezAndSetDepth);

@@ -98,10 +98,12 @@ public class CrawlerHelper {
 			Scanner in = new Scanner(System.in);
 			
 			boolean nice = false;
+			int input = Crawler.NUM_OF_DEFAULT_THREADS;
+			
 			while (!nice) {
 				try{
 					System.out.println("Enter amount of threads which you want to do parsing:");
-					int input = in.nextInt();
+					input = in.nextInt();
 					if (input > 0 && input < 100) nice = true;
 				}
 				catch (Exception e) {
@@ -109,6 +111,8 @@ public class CrawlerHelper {
 				}
 				System.out.println("");
 			}
+			//System.out.println("");
+			return input;
 		} 
 		else {
 			// Считывание из аргументов командной строки
