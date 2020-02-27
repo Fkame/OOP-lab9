@@ -39,8 +39,10 @@ public class URLPool {
         if (depthPair.getDepth() < this.depth) {
             notWatchedList.addLast(depthPair);
             added = true;
-                
-            waitingThreads--;
+            
+			// Если число ожидающих потоков больше нуля, тогда меняем значение счётчика, 
+			// иначе получится бред с его значением
+			if (waitingThreads > 0) waitingThreads--;
             this.notify();
         }
         // Если глубина больше максимальной - добавляем в список недоступных

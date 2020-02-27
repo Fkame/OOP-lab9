@@ -8,9 +8,7 @@ public class Crawler {
 
 	public static final int HTTP_PORT = 80;
 	public static final String HOOK_REF = "<a href=\"";
-	
-	public static final String BAD_REQUEST_LINE = "HTTP/1.1 400 Bad Request";
-	
+	public static final String BAD_REQUEST_LINE = "HTTP/1.1 400 Bad Request";	
 	public static final int NUM_OF_DEFAULT_THREADS = 4;
 	
 
@@ -49,6 +47,9 @@ public class Crawler {
         int initialActive = Thread.activeCount();
 		
 		while (pool.getWaitThreads() != crawler.numOfThreads) {
+			
+			//System.out.println("Wait threads = " + pool.getWaitThreads() + "\n");
+			
             if (Thread.activeCount() - initialActive < crawler.numOfThreads) {
                 CrawlerTask crawlerTask = new CrawlerTask(pool);
                 new Thread(crawlerTask).start();
@@ -95,11 +96,6 @@ public class Crawler {
 		
 		System.exit(0);
 		
-		
-		
-		//crawler.startParse();
-		//crawler.showResults();
-		//crawler.testParse();
 	}
 	
 	/*
@@ -113,24 +109,9 @@ public class Crawler {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		//notVisitedList.addLast(newURL);
 		listOfUrl.addLast(newURL);
 	}
 	
-
-	/*
-	* Получение списков
-	*/
-	/*
-	public LinkedList<URLDepthPair> getVisitedSites() {
-		return this.visitedList;
-	}
-
-	public LinkedList<URLDepthPair> getNotVisitedSites() {
-		return this.notVisitedList;
-	}
-	*/
-
 
 	/*
 	* Проверка командной строки, ввода пользователя и добавление первого объекта URLDepthPair
@@ -153,7 +134,6 @@ public class Crawler {
 		this.depth = urlDepth.getDepth();
 		urlDepth.setDepth(0);
 
-		// Занесение в список
 		
 		return(urlDepth);
 
@@ -237,21 +217,21 @@ public class Crawler {
 						
 					// Если ссылка ведёт на сайт с протоколом https - пропускаем
 					if (url.startsWith("https://")) {
-						System.out.println(strCount + " |  " + url + " --> https-refference\n");
+						//System.out.println(strCount + " |  " + url + " --> https-refference\n");
 						continue;
 					}
 						
 					// Если ссылка - ссылка с возвратом
 					if (url.startsWith("../")) {		
 						String newUrl = CrawlerHelper.urlFromBackRef(element.getURL(), url);
-						System.out.println(strCount + " |  " + url + " --> " +  newUrl + "\n");
+						//System.out.println(strCount + " |  " + url + " --> " +  newUrl + "\n");
 						Crawler.createURlDepthPairObject(newUrl, element.getDepth() + 1, listOfUrl);
 					} 
 						
 					// Если это новая http ссылка
 					else if (url.startsWith("http://")) {
 						String newUrl = CrawlerHelper.cutTrashAfterFormat(url);
-						System.out.println(strCount + " |  " + url + " --> " + newUrl + "\n");
+						//System.out.println(strCount + " |  " + url + " --> " + newUrl + "\n");
 						Crawler.createURlDepthPairObject(newUrl, element.getDepth() + 1, listOfUrl);
 					} 
 						
@@ -260,9 +240,8 @@ public class Crawler {
                     // После очистки можно клеить с основной ссылкой
 					else {		
 						String newUrl;
-						newUrl = CrawlerHelper.cutURLEndFormat(element.getURL()) + url;
-							
-						System.out.println(strCount + " |  " + url + " --> " + newUrl + "\n");
+						newUrl = CrawlerHelper.cutURLEndFormat(element.getURL()) + url;		
+						//System.out.println(strCount + " |  " + url + " --> " + newUrl + "\n");
 						Crawler.createURlDepthPairObject(newUrl, element.getDepth() + 1, listOfUrl);
 					}
 						
@@ -274,11 +253,10 @@ public class Crawler {
 			}
 				
 			if (strCount == 1) {
-				//System.out.println("No http refs in this page!");
+				System.out.println("No http refs in this page!");
 				return null;
 			}
 			//System.out.println("---End of file---\n");
-
 			//System.out.println("Page had been closed\n");
 				
 		}
@@ -289,14 +267,6 @@ public class Crawler {
 			e.printStackTrace();
 		}
 			
-		// Перемещение сайта после просмотра в список просмотренных
-		//moveURLPair(nowPage, socket);
-			
-		// Ещё одна избыточность, для правльной работы цикла в случае, когда не возникло ошибок
-		//nowPage = notVisitedList.getFirst();
-		
-		Crawler.showResults(element, listOfUrl);
-		
 		return listOfUrl;
 	}
 
