@@ -21,7 +21,7 @@ public class Crawler {
 	// Глубина поиска
 	public int depth;
 	
-	//Количество потоков
+	//Количество потоков, которое вводит пользователь или их число подается при запуске программы
 	public int numOfThreads;
 
 	// Конструктор
@@ -40,6 +40,8 @@ public class Crawler {
 		// Считывание данных с консоли как аргументов, или запрос данных от пользователя
 		// Функция getFirstURLDepthPair также настраивает максимальную глубину
 		URLDepthPair firstRezAndSetDepth = crawler.getFirstURLDepthPair(args);
+		crawler.numOfThreads = CrawlerHelper.getNumOfThreads(args);
+		
 		URLPool pool = new URLPool(crawler.depth);
         pool.put(firstRezAndSetDepth);
 		
@@ -82,7 +84,7 @@ public class Crawler {
 		}
 		
 		list = pool.getBlockedList();
-		System.out.println("Pages that have not been parsed:");
+		System.out.println("\nPages that have not been parsed:");
 		count = 1;
 		for (URLDepthPair page : list) {
 			System.out.println(count + " |  " + page.toString());
